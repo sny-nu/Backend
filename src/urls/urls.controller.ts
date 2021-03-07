@@ -9,12 +9,6 @@ export class UrlsController
         private readonly urlsService: UrlsService
     )
     {}
-    
-    @Get("v1/url")
-    async getAll(): Promise<Url[]>
-    {
-        return await this.urlsService.getAll();
-    }
 
     @Get("v1/url/:hash")
     async getByHash(@Param("hash") hash: string): Promise<Url>
