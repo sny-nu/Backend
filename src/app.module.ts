@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import * as dotenv from 'dotenv';
@@ -10,6 +12,10 @@ dotenv.config();
     imports: 
     [
         UrlsModule,
+        ThrottlerModule.forRoot({
+            ttl: 60,
+            limit: 10,
+        }),
         TypeOrmModule.forRoot(
         {
             type: 'mysql',
@@ -21,6 +27,12 @@ dotenv.config();
             entities: [__dirname + '/entities/*.entity{.ts,.js}'],
             synchronize: false,
         }),
+    ],
+    providers: [
+        {
+            provide: APP_GUARD,
+            useClass: ThrottlerGuard,
+        },
     ],
 })
 export class AppModule {}

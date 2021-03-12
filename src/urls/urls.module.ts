@@ -6,7 +6,7 @@ import { UrlsService } from "./urls.service";
 
 @Module({
     imports:[
-        TypeOrmModule.forFeature([UrlsRepository])
+        TypeOrmModule.forFeature([UrlsRepository]),
     ],
     providers: [UrlsService],
     controllers: [UrlsController],
