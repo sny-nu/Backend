@@ -15,6 +15,9 @@ export class UpdateUrl
     @Column({ length: 255})
     shortUrl?: string;
 
+    @Column()
+    safeRedirect?: number;
+
     @Column('datetime', { select: true })
     createdAt?: Date;
 
