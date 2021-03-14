@@ -25,7 +25,7 @@ export class UrlsController
         }
 
         if (!url.originalUrl.includes("https://") && !url.originalUrl.includes("http://")) {
-                const completeUrl = "http://" + url;
+                const completeUrl = "http://" + url.originalUrl;
                 url.originalUrl = completeUrl;
         }
 
