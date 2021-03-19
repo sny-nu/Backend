@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UrlsRepository } from './urls.repository';
 import { Url } from 'src/entities/url.entity';
 import * as dotenv from 'dotenv';
+import { ThreatsService } from 'src/threats/threats.service';
 
 const cryptoRandomString = require('crypto-random-string');
 dotenv.config();
@@ -13,6 +14,7 @@ export class UrlsService
     constructor(
         @InjectRepository(UrlsRepository)
         private readonly urlsRepository: UrlsRepository,
+        private readonly threatService: ThreatsService
     )
     {}
 
@@ -50,6 +52,16 @@ export class UrlsService
 
         url.hash = hash;
         url.shortUrl = process.env.SITE_URL + hash;
+
+        setTimeout(async () => 
+        {
+            const response = await this.threatService.addThreatsToUrl(url.originalUrl, url.hash);
+            if (response == 1)
+            {
+                url.hasThreats = 1;
+                this.urlsRepository.updateUrl(url.id, url);
+            }
+        }, 5000);
 
         return await this.urlsRepository.createUrl(url);
     }

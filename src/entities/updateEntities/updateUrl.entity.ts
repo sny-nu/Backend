@@ -18,6 +18,9 @@ export class UpdateUrl
     @Column()
     safeRedirect?: number;
 
+    @Column()
+    hasThreats?: number;
+
     @Column('datetime', { select: true })
     createdAt?: Date;
 

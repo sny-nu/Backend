@@ -1,12 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Generated, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Threat } from "./threat.entity";
 
 @Entity()
 export class Url 
 {
-    @PrimaryGeneratedColumn()
+    @Generated()
     id: number;
 
-    @Column({ length: 255 })
+    @PrimaryColumn({ length: 255 })
     hash?: string;
 
     @Column({ length: 512 })
@@ -18,9 +19,16 @@ export class Url
     @Column()
     safeRedirect: number;
 
+    @Column()
+    hasThreats?: number;
+
     @Column('datetime', { select: true })
     createdAt?: Date;
 
     @Column('datetime', { select: false })
     deletedAt?: Date;
+
+    @OneToMany(type => Threat, threat => threat.url)
+    threats: Threat[];
+
 }

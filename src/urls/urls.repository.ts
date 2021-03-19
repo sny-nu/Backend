@@ -36,7 +36,8 @@ export class UrlsRepository extends Repository<Url>
         const url = await this.findOne({
             where: {
                 hash: urlHash
-            }
+            },
+            relations: ['threats']
         });
 
         if (!url)

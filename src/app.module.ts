@@ -4,6 +4,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import * as dotenv from 'dotenv';
+import { ThreatsModule } from './threats/threats.module';
 import { UrlsModule } from './urls/urls.module';
 dotenv.config();
 
@@ -12,6 +13,7 @@ dotenv.config();
     imports: 
     [
         UrlsModule,
+        ThreatsModule,
         ThrottlerModule.forRoot({
             ttl: 60,
             limit: 10,
