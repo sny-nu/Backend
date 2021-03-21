@@ -71,7 +71,7 @@ export class UrlsRepository extends Repository<Url>
         return this.save(url);
     }
 
-    updateUrl = async (urlHash: string, url: Url): Promise<Url> =>
+    updateUrl = async (urlHash: string, url: UpdateUrl): Promise<Url> =>
     {
         return await this.save({ ...url, hash: urlHash });
     }

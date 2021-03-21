@@ -3,7 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UrlsRepository } from './urls.repository';
 import { Url } from 'src/entities/url.entity';
 import * as dotenv from 'dotenv';
-import { ThreatsService } from 'src/threats/threats.service';
+import { InjectQueue, Process, Processor } from '@nestjs/bull';
+import { Job, Queue } from 'bull';
+import { UpdateResult } from 'typeorm';
+import { UpdateUrl } from 'src/entities/updateEntities/updateUrl.entity';
 
 const cryptoRandomString = require('crypto-random-string');
 dotenv.config();
@@ -12,9 +15,8 @@ dotenv.config();
 export class UrlsService 
 {
     constructor(
-        @InjectRepository(UrlsRepository)
-        private readonly urlsRepository: UrlsRepository,
-        private readonly threatService: ThreatsService
+        @InjectQueue(process.env.REDIS_QUEUE_NAME) private urlHashQueue: Queue,
+        @InjectRepository(UrlsRepository) private readonly urlsRepository: UrlsRepository,
     )
     {}
 
@@ -53,16 +55,22 @@ export class UrlsService
         url.hash = hash;
         url.shortUrl = process.env.SITE_URL + hash;
 
-        setTimeout(async () => 
-        {
-            const response = await this.threatService.addThreatsToUrl(url.originalUrl, url.hash);
-            if (response == 1)
-            {
-                url.hasThreats = 1;
-                this.urlsRepository.updateUrl(url.hash, url);
-            }
-        }, 5000);
+        const response = await this.urlsRepository.createUrl(url);
 
-        return await this.urlsRepository.createUrl(url);
+        await this.urlHashQueue.add('threats', 
+        {
+            ...url
+        }, { delay: 2000 })
+
+        return response;
+    }
+
+    async updateToHasThreat(urlHash: string): Promise<Url>
+    {
+        const url: UpdateUrl = {
+            hasThreats: 1,
+        };
+
+        return this.urlsRepository.updateUrl(urlHash, url);
     }
 }
