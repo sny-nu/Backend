@@ -59,7 +59,7 @@ export class UrlsService
             if (response == 1)
             {
                 url.hasThreats = 1;
-                this.urlsRepository.updateUrl(url.id, url);
+                this.urlsRepository.updateUrl(url.hash, url);
             }
         }, 5000);
 

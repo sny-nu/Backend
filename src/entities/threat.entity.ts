@@ -2,6 +2,8 @@ import { Column, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, Uniqu
 import { Url } from "./url.entity";
 
 @Entity()
+@Unique("url_threat", ["urlHash", "type"])
+@Unique("urlHash", ["urlHash"])
 export class Threat
 {
     @PrimaryColumn({ length: 50 })
