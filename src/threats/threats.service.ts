@@ -32,8 +32,6 @@ export class ThreatsService
     {
         const url = job.data;
         const threats = await this.checkIfUrlIsSafe(url.originalUrl);
-
-        console.log(url);
         
         if (threats.threat != null)
         {
@@ -45,7 +43,6 @@ export class ThreatsService
 
     async checkIfUrlIsSafe(url: string)
     {
-        console.log(url);
         const { WebRiskServiceClient } = require("@google-cloud/web-risk");
         const client = new WebRiskServiceClient();
 
@@ -60,7 +57,6 @@ export class ThreatsService
         };
 
         const response = await client.searchUris(request);
-        console.log(response);
         return response[0];
     }
 }
