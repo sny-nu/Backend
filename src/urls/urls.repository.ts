@@ -71,17 +71,17 @@ export class UrlsRepository extends Repository<Url>
         return this.save(url);
     }
 
-    updateUrl = async (urlId: number, url: Url): Promise<Url> =>
+    updateUrl = async (urlHash: string, url: UpdateUrl): Promise<Url> =>
     {
-        return await this.save({ ...url, id: urlId });
+        return await this.save({ ...url, hash: urlHash });
     }
 
-    deleteUrl = async (urlId: number): Promise<UpdateResult> => 
+    deleteUrl = async (urlHash: string): Promise<UpdateResult> => 
     {
         const deletedUrlData: UpdateUrl = {
             deletedAt: new Date(),
         };
 
-        return this.update({ id: urlId}, deletedUrlData)
+        return this.update({ hash: urlHash }, deletedUrlData)
     }
 }
