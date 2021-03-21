@@ -4,31 +4,27 @@ import { Threat } from "./threat.entity";
 @Entity()
 export class Url 
 {
-    @Generated()
-    id: number;
-
     @PrimaryColumn({ length: 255 })
     hash?: string;
 
-    @Column({ length: 512 })
+    @Column({ length: 512, nullable: false })
     originalUrl: string;
 
-    @Column({ length: 255})
+    @Column({ length: 255, nullable: false })
     shortUrl?: string;
 
-    @Column()
+    @Column('int', { default: 0, nullable: false })
     safeRedirect: number;
 
-    @Column()
-    hasThreats?: number;
+    @Column('int', { default: 0, nullable: false })
+    hasThreats?:  number;
 
-    @Column('datetime', { select: true })
+    @Column({ select: true, type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false })
     createdAt?: Date;
 
-    @Column('datetime', { select: false })
+    @Column('timestamp', { select: false })
     deletedAt?: Date;
 
     @OneToMany(type => Threat, threat => threat.url)
     threats: Threat[];
-
 }

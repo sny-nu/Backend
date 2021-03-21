@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { BullModule } from '@nestjs/bull';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,6 +15,12 @@ dotenv.config();
     [
         UrlsModule,
         ThreatsModule,
+        BullModule.forRoot({
+            redis: {
+                host: process.env.REDIS_URL,
+                port: 6380,
+            },
+        }),
         ThrottlerModule.forRoot({
             ttl: 60,
             limit: 10,
@@ -27,7 +34,7 @@ dotenv.config();
             password: process.env.DB_PASSWORD,
             database: process.env.DB_DATABASE,
             entities: [__dirname + '/entities/*.entity{.ts,.js}'],
-            synchronize: false,
+            synchronize: true,
         }),
     ],
     providers: [
