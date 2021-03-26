@@ -6,7 +6,7 @@ import * as dotenv from 'dotenv';
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 import { UpdateResult } from 'typeorm';
-import { UpdateUrl } from 'src/entities/updateEntities/updateUrl.entity';
+import { UpdateUrl } from 'src/entities/extra/updateUrl.entity';
 
 const cryptoRandomString = require('crypto-random-string');
 dotenv.config();
