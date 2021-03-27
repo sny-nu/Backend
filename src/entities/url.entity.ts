@@ -1,4 +1,5 @@
 import { Column, Entity, Generated, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Analytics } from "./analytics.entity";
 import { Threat } from "./threat.entity";
 
 @Entity()
@@ -27,4 +28,7 @@ export class Url
 
     @OneToMany(type => Threat, threat => threat.url)
     threats: Threat[];
+
+    @OneToMany(type => Analytics, analytics => analytics.url)
+    analytics: Analytics[];
 }

@@ -1,6 +1,6 @@
 import { NotFoundException } from "@nestjs/common";
 import { Url } from "src/entities/url.entity";
-import { UpdateUrl } from "src/entities/updateEntities/updateUrl.entity";
+import { UpdateUrl } from "src/entities/extra/updateUrl.entity";
 import { EntityRepository, IsNull, Repository, UpdateResult } from "typeorm";
 
 @EntityRepository(Url)
