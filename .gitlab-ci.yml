@@ -13,7 +13,7 @@ build_test:
     - docker build --no-cache --build-arg DB_HOST="$DB_HOST" --build-arg DB_USER="$TEST_DB_USER" 
       --build-arg DB_PASS="$TEST_DB_PASSWORD" --build-arg DB_NAME="$TEST_DB_NAME" 
       --build-arg WEB_RISK_TOKEN=webRisktToken.json --build-arg SITE_URL="$TEST_SITE_URL"
-      --build-arg REDIS_URL="$REDIS_URL" --build-arg REDIS_QUEUE="TEST_REDIS_QUEUE"
+      --build-arg REDIS_URL="$REDIS_URL" --build-arg REDIS_QUEUE="$TEST_REDIS_QUEUE"
       -t $CI_REGISTRY/snynu/backend/test:${CI_COMMIT_SHA} -t $CI_REGISTRY/snynu/backend/test:latest .
     - docker push $CI_REGISTRY/snynu/backend/test:${CI_COMMIT_SHA}
     - docker push $CI_REGISTRY/snynu/backend/test:latest
@@ -30,7 +30,7 @@ build_production:
     - docker build --no-cache --build-arg DB_HOST="$DB_HOST" --build-arg DB_USER="$DB_USER" 
       --build-arg DB_PASS="$DB_PASSWORD" --build-arg DB_NAME="$DB_NAME" 
       --build-arg WEB_RISK_TOKEN=webRisktToken.json --build-arg SITE_URL="$SITE_URL"
-      --build-arg REDIS_URL="$REDIS_URL" --build-arg REDIS_QUEUE="TEST_REDIS_QUEUE"
+      --build-arg REDIS_URL="$REDIS_URL" --build-arg REDIS_QUEUE="$REDIS_QUEUE"
       -t $CI_REGISTRY/snynu/backend:${CI_COMMIT_SHA} -t $CI_REGISTRY/snynu/backend:latest .
     - docker push $CI_REGISTRY/snynu/backend:${CI_COMMIT_SHA}
     - docker push $CI_REGISTRY/snynu/backend:latest

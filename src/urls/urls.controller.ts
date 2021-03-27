@@ -1,4 +1,6 @@
-import { BadRequestException, Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Headers, Query } from '@nestjs/common';
+import { AnalyticsService } from 'src/analytics/analytics.service';
+import { Analytics } from 'src/entities/analytics.entity';
 import { Url } from 'src/entities/url.entity';
 import { UrlsService } from './urls.service';
 
@@ -6,14 +8,23 @@ import { UrlsService } from './urls.service';
 export class UrlsController 
 {
     constructor(
-        private readonly urlsService: UrlsService
+        private readonly urlsService: UrlsService,
+        private readonly analyticsService: AnalyticsService
     )
     {}
 
     @Get("v1/url/:hash")
-    async getByHash(@Param("hash") hash: string): Promise<Url>
+    async getByHash(@Param("hash") hash: string, @Headers() headers, @Query() query): Promise<Url>
     {
-        return await this.urlsService.getByHash(hash);
+        const url = await this.urlsService.getByHash(hash);
+
+        if (url != null && query.stat) 
+        {
+            const UA = headers['user-agent'];
+            this.analyticsService.addAnalytics(UA, hash);
+        }
+        
+        return url;
     }
 
     @Post("v1/url")
@@ -24,9 +35,10 @@ export class UrlsController
             throw new BadRequestException(`The URL that was provided, '${url.originalUrl}' is not a valid URL`)
         }
 
-        if (!url.originalUrl.includes("https://") && !url.originalUrl.includes("http://")) {
-                const completeUrl = "http://" + url.originalUrl;
-                url.originalUrl = completeUrl;
+        if (!url.originalUrl.includes("https://") && !url.originalUrl.includes("http://")) 
+        {
+            const completeUrl = "http://" + url.originalUrl;
+            url.originalUrl = completeUrl;
         }
 
         return this.urlsService.create(url);
