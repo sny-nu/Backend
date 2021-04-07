@@ -14,15 +14,13 @@ export class UrlsController
     {}
 
     @Get("v1/url/:hash")
-    async getByHash(@Param("hash") hash: string, @Headers() headers, @Query() query): Promise<Url>
+    async getByHash(@Param("hash") hash: string, @Headers() headers): Promise<Url>
     {
         const url = await this.urlsService.getByHash(hash);
 
-        if (url != null && query.stat) 
-        {
-            const UA = headers['user-agent'];
-            this.analyticsService.addAnalytics(UA, hash);
-        }
+        // Save statistics
+        const UA = headers['user-agent'];
+        this.analyticsService.addAnalytics(UA, hash);
         
         return url;
     }
