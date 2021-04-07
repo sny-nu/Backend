@@ -32,12 +32,12 @@ export class UrlsService
 
     async create(url: Url): Promise<Url>
     {
-        const urlAlreadyExists = await this.urlsRepository.getByOriginalUrl(url.originalUrl);
+        // const urlAlreadyExists = await this.urlsRepository.getByOriginalUrl(url.originalUrl);
 
-        if (urlAlreadyExists != undefined || urlAlreadyExists != null)
-        {
-            return urlAlreadyExists;
-        }
+        // if (urlAlreadyExists != undefined || urlAlreadyExists != null)
+        // {
+        //     return urlAlreadyExists;
+        // }
 
         var uniqueHash = false;
         var hash = null;
