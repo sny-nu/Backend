@@ -1,4 +1,5 @@
 import { BadRequestException, Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { Threat } from 'src/entities/threat.entity';
 import { ThreatsService } from './threats.service';
 
@@ -10,6 +11,7 @@ export class ThreatsController
     )
     {}
 
+    @ApiExcludeEndpoint()
     @Get("v1/threat/:hash")
     async getAllByUrlHash(@Param("hash") hash: string): Promise<Threat[]>
     {

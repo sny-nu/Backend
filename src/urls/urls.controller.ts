@@ -1,4 +1,5 @@
 import { BadRequestException, Body, Controller, Get, Param, Post, Headers, Query } from '@nestjs/common';
+import { ApiOkResponse } from '@nestjs/swagger';
 import { AnalyticsService } from 'src/analytics/analytics.service';
 import { Analytics } from 'src/entities/analytics.entity';
 import { Url } from 'src/entities/url.entity';
@@ -13,6 +14,10 @@ export class UrlsController
     )
     {}
 
+    @ApiOkResponse({
+        description: 'Get short url on hash',
+        type: Url
+    })
     @Get("v1/url/:hash")
     async getByHash(@Param("hash") hash: string, @Headers() headers): Promise<Url>
     {
@@ -25,6 +30,10 @@ export class UrlsController
         return url;
     }
 
+    @ApiOkResponse({
+        description: 'Post new URL that needs to shortened',
+        type: Url
+    })
     @Post("v1/url")
     async create(@Body() url: Url): Promise<Url>
     {

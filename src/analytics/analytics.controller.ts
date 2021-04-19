@@ -1,4 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { Analytics } from 'src/entities/analytics.entity';
 import { AnalyticsService } from './analytics.service';
 
@@ -10,6 +11,7 @@ export class AnalyticsController
     )
     {}
 
+    @ApiExcludeEndpoint()
     @Get("v1/analytics/:hash")
     async getAllByUrlHash(@Param("hash") hash: string): Promise<Analytics[]>
     {
