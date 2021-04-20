@@ -29,77 +29,52 @@ export class AnalyticsService
 
     async getStats(analytics: Analytics[], urlHash: string) : Promise<UrlStats>
     {
-        const browserUsage = [], 
+        let browserUsage = [], 
             deviceTypeUsage = [],
             osUsage = [];
 
         for await(const { browser, deviceType, os } of analytics) {
             // Browser Usage
             const browserName = (browser == '' || browser == 'Unknown') ? 'Unknown' : browser
-            const bIndex = browserUsage.findIndex((x) => { return x.name == browserName });
-            bIndex == -1 ? browserUsage.push({ 
-                name: browserName, 
-                count: 1
-            }) : browserUsage[bIndex].count ++;
+            browserUsage = await this.getUsageStats(browserName, browserUsage);
 
             // Device type usage
             const deviceTypeName = (deviceType == '' || deviceType == 'Unknown') ? 'Unknown' : 
                                     (deviceType == 'desktop') ? 'Desktop' : 
                                     (deviceType == 'mobile') ? 'Mobile' : 
                                     (deviceType == 'tablet') ? 'Tablet' : deviceType;
-            const dIndex = deviceTypeUsage.findIndex((x) => { return x.name == deviceTypeName });
-            dIndex == -1 ? deviceTypeUsage.push({ 
-                name: deviceTypeName, 
-                count: 1
-            }) : deviceTypeUsage[dIndex].count ++;
+            deviceTypeUsage = await this.getUsageStats(deviceTypeName, deviceTypeUsage);
 
             // OS Type usage
             const osName = (os == '' || os == 'Unknown') ? 'Unknown' : os;
-            const oIndex = osUsage.findIndex((x) => { return x.name == osName });
-            oIndex == -1 ? osUsage.push({
-                name: osName,
-                count: 1
-            }) : osUsage[oIndex].count ++;
+            osUsage = await this.getUsageStats(osName, osUsage);
         };
 
         const date = new Date();
         var currentToday = new Date();
 
         // Get clicks today
-        var startToday = new Date();
-        startToday.setHours(2, 0, 0, 0);
+        var startToday = date;
+        startToday.setHours(0, 0, 0, 0);
 
-        const dataToday = analytics.filter(a => {
-            const date = new Date(a.requestedOn);
-            return (date >= startToday && date <= currentToday);
-        });
+        const dataToday = await this.getDataOnPeriod(analytics, startToday, currentToday);
 
         // Get clicks this week
         const dayNumberWeek = date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1);
         const startWeek = new Date(date.setDate(dayNumberWeek));
-        startWeek.setHours(2, 0, 0, 0);
+        startWeek.setHours(0, 0, 0, 0);
 
-        const dataWeek = analytics.filter(a => {
-            const date = new Date(a.requestedOn);
-            return (date >= startWeek && date <= currentToday);
-        });
+        const dataWeek = await this.getDataOnPeriod(analytics, startWeek, currentToday);
 
         // Get clicks this month
-        const startMonth = new Date(date. getFullYear(), date. getMonth(), 2, -22);        
-        
-        const dataMonth = analytics.filter(a => {
-            const date = new Date(a.requestedOn);
-            return (date >= startMonth && date <= currentToday);
-        });
+        const startMonth = new Date(date. getFullYear(), date. getMonth(), 1); 
+
+        const dataMonth = await this.getDataOnPeriod(analytics, startMonth, currentToday);
 
         // Average clicks
-        const startOfYear = new Date(date.getFullYear(), 0, 1, 1);
+        const startOfYear = new Date(date.getFullYear(), 0, 1, -1);
         const dayOfYear = (date, startOfYear) => Math.floor((date - startOfYear) / 1000 / 60 / 60 / 24);  
-        
-        const dayNumber = dayOfYear(date, startOfYear);
-
-        console.log(dayNumber);
-        
+        const dayNumber = dayOfYear(date, startOfYear);        
 
         const urlStats: UrlStats = {
             urlHash: urlHash,
@@ -119,6 +94,27 @@ export class AnalyticsService
         };  
 
         return urlStats;
+    }
+
+    async getUsageStats(itemName: string, usageArray: { name: string, count: number }[]) : Promise<object[]>
+    {
+        const index = usageArray.findIndex((x) => { return x.name == itemName });
+            index == -1 ? usageArray.push({ 
+                name: itemName, 
+                count: 1
+            }) : usageArray[index].count ++;
+
+        return usageArray;
+    }
+
+    async getDataOnPeriod(fullData: Analytics[], startDate: Date, endDate: Date) : Promise<Analytics[]> {
+        const data = fullData.filter(a => {
+            const date = new Date(a.requestedOn);
+            
+            return (date >= startDate && date <= endDate);
+        });
+
+        return data;
     }
 
     async addAnalytics(ua: any, urlHash: string) 
