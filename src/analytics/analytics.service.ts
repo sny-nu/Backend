@@ -74,7 +74,10 @@ export class AnalyticsService
         // Average clicks
         const startOfYear = new Date(date.getFullYear(), 0, 1, -1);
         const dayOfYear = (date, startOfYear) => Math.floor((date - startOfYear) / 1000 / 60 / 60 / 24);  
-        const dayNumber = dayOfYear(date, startOfYear);        
+        const dayNumber = dayOfYear(date, startOfYear);    
+        
+        // Most Used browser
+        const mostUsedBrowser = browserUsage.reduce((p, c) => p.count > c.count ? p : c);
 
         const urlStats: UrlStats = {
             urlHash: urlHash,
@@ -84,7 +87,7 @@ export class AnalyticsService
             clicksThisMonth: dataMonth.length,
             clicksThisYear: analytics.length,
 
-            mostUsedBrowser: "Coming Soon",
+            mostUsedBrowser: mostUsedBrowser.name,
             averageClicksPerDay: analytics.length / dayNumber,
 
             browserUsage,
