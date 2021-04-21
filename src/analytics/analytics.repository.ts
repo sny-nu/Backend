@@ -1,5 +1,6 @@
 import { Between, EntityRepository, Repository } from "typeorm";
 import { Analytics } from "src/entities/analytics.entity";
+import { NotFoundException } from "@nestjs/common";
 
 export const AfterDate = (fromDate: Date, tillDate) => Between(fromDate, tillDate);
 
@@ -16,7 +17,11 @@ export class AnalyticsRepository extends Repository<Analytics>
                 urlHash: urlHash,
                 requestedOn: AfterDate(fromDate, tillDate)
             }
-        });        
+        });  
+                
+        if (analytics.length == 0) {
+            throw new NotFoundException();
+        }
 
         return analytics;
     }
