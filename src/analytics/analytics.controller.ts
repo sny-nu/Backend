@@ -19,4 +19,11 @@ export class AnalyticsController
         const result = await this.analyticsService.getByUrlHash(hash);
         return result;
     }
+
+    @ApiExcludeEndpoint()
+    @Get("v1/analytics/:hash/raw")
+    async getByUrlHash2(@Param("hash") hash: string): Promise<Analytics[]>
+    {
+        return await this.analyticsService.getByUrlHashRaw(hash);
+    }
 }
