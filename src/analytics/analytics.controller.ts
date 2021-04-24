@@ -1,5 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { UrlStats } from 'src/dto/urlStats.dto';
 import { Analytics } from 'src/entities/analytics.entity';
 import { AnalyticsService } from './analytics.service';
 
@@ -13,8 +14,16 @@ export class AnalyticsController
 
     @ApiExcludeEndpoint()
     @Get("v1/analytics/:hash")
-    async getAllByUrlHash(@Param("hash") hash: string): Promise<Analytics[]>
+    async getByUrlHash(@Param("hash") hash: string): Promise<UrlStats>
     {
-        return await this.analyticsService.getAllByUrlHash(hash);
+        const result = await this.analyticsService.getByUrlHash(hash);
+        return result;
+    }
+
+    @ApiExcludeEndpoint()
+    @Get("v1/analytics/:hash/raw")
+    async getByUrlHash2(@Param("hash") hash: string): Promise<Analytics[]>
+    {
+        return await this.analyticsService.getByUrlHashRaw(hash);
     }
 }
