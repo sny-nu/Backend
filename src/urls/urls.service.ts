@@ -43,7 +43,7 @@ export class UrlsService
         var hash = null;
         while (!uniqueHash)
         {
-            hash = cryptoRandomString({length: 10, type: 'url-safe'});
+            hash = cryptoRandomString({length: 10, char: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_~'});
             const hashExists = await this.urlsRepository.getByHashForCheck(hash);
 
             if(!hashExists)
