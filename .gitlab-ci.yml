@@ -1,59 +1,65 @@
+# You can override the included template(s) by including variable overrides
+# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
+# Note that environment variables can be set in several places
+# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 image: docker:latest
-
 stages:
-  - build
-  - deploy
-
+- build
+- deploy
+- test
 build_test:
   stage: build
   before_script:
-    - docker login -u "$CI_DEPLOY_USER" -p "$CI_DEPLOY_PASSWORD" $CI_REGISTRY
+  - docker login -u "$CI_DEPLOY_USER" -p "$CI_DEPLOY_PASSWORD" $CI_REGISTRY
   script:
-    - cat "$WEB_RISK_TOKEN" > webRisktToken.json
-    - docker build --no-cache --build-arg DB_HOST="$DB_HOST" --build-arg DB_USER="$TEST_DB_USER" 
-      --build-arg DB_PASS="$TEST_DB_PASSWORD" --build-arg DB_NAME="$TEST_DB_NAME" 
-      --build-arg WEB_RISK_TOKEN=webRisktToken.json --build-arg SITE_URL="$TEST_SITE_URL"
-      --build-arg REDIS_URL="$REDIS_URL" --build-arg REDIS_QUEUE="$TEST_REDIS_QUEUE"
-      -t $CI_REGISTRY/snynu/backend/test:${CI_COMMIT_SHA} -t $CI_REGISTRY/snynu/backend/test:latest .
-    - docker push $CI_REGISTRY/snynu/backend/test:${CI_COMMIT_SHA}
-    - docker push $CI_REGISTRY/snynu/backend/test:latest
-    - echo "built image $CI_REGISTRY/snynu/backend/test:${CI_COMMIT_SHA}"
+  - cat "$WEB_RISK_TOKEN" > webRisktToken.json
+  - docker build --no-cache --build-arg DB_HOST="$DB_HOST" --build-arg DB_USER="$TEST_DB_USER"
+    --build-arg DB_PASS="$TEST_DB_PASSWORD" --build-arg DB_NAME="$TEST_DB_NAME" --build-arg
+    WEB_RISK_TOKEN=webRisktToken.json --build-arg SITE_URL="$TEST_SITE_URL" --build-arg
+    REDIS_URL="$REDIS_URL" --build-arg REDIS_QUEUE="$TEST_REDIS_QUEUE" -t $CI_REGISTRY/snynu/backend/test:${CI_COMMIT_SHA}
+    -t $CI_REGISTRY/snynu/backend/test:latest .
+  - docker push $CI_REGISTRY/snynu/backend/test:${CI_COMMIT_SHA}
+  - docker push $CI_REGISTRY/snynu/backend/test:latest
+  - echo "built image $CI_REGISTRY/snynu/backend/test:${CI_COMMIT_SHA}"
   only:
-    - develop
-
+  - develop
 build_production:
   stage: build
   before_script:
-    - docker login -u "$CI_DEPLOY_USER" -p "$CI_DEPLOY_PASSWORD" $CI_REGISTRY
+  - docker login -u "$CI_DEPLOY_USER" -p "$CI_DEPLOY_PASSWORD" $CI_REGISTRY
   script:
-    - cat "$WEB_RISK_TOKEN" > webRisktToken.json
-    - docker build --no-cache --build-arg DB_HOST="$DB_HOST" --build-arg DB_USER="$DB_USER" 
-      --build-arg DB_PASS="$DB_PASSWORD" --build-arg DB_NAME="$DB_NAME" 
-      --build-arg WEB_RISK_TOKEN=webRisktToken.json --build-arg SITE_URL="$SITE_URL"
-      --build-arg REDIS_URL="$REDIS_URL" --build-arg REDIS_QUEUE="$REDIS_QUEUE"
-      -t $CI_REGISTRY/snynu/backend:${CI_COMMIT_SHA} -t $CI_REGISTRY/snynu/backend:latest .
-    - docker push $CI_REGISTRY/snynu/backend:${CI_COMMIT_SHA}
-    - docker push $CI_REGISTRY/snynu/backend:latest
-    - echo "built image $CI_REGISTRY/snynu/backend:${CI_COMMIT_SHA}"
+  - cat "$WEB_RISK_TOKEN" > webRisktToken.json
+  - docker build --no-cache --build-arg DB_HOST="$DB_HOST" --build-arg DB_USER="$DB_USER"
+    --build-arg DB_PASS="$DB_PASSWORD" --build-arg DB_NAME="$DB_NAME" --build-arg
+    WEB_RISK_TOKEN=webRisktToken.json --build-arg SITE_URL="$SITE_URL" --build-arg
+    REDIS_URL="$REDIS_URL" --build-arg REDIS_QUEUE="$REDIS_QUEUE" -t $CI_REGISTRY/snynu/backend:${CI_COMMIT_SHA}
+    -t $CI_REGISTRY/snynu/backend:latest .
+  - docker push $CI_REGISTRY/snynu/backend:${CI_COMMIT_SHA}
+  - docker push $CI_REGISTRY/snynu/backend:latest
+  - echo "built image $CI_REGISTRY/snynu/backend:${CI_COMMIT_SHA}"
   only:
-    - master
-    
+  - master
 deploy_test:
   stage: deploy
   before_script:
-    - docker login -u "$CI_DEPLOY_USER" -p "$CI_DEPLOY_PASSWORD" $CI_REGISTRY
+  - docker login -u "$CI_DEPLOY_USER" -p "$CI_DEPLOY_PASSWORD" $CI_REGISTRY
   script:
-    - echo "deploy image $CI_REGISTRY/snynu/backend/test:${CI_COMMIT_SHA}"
-    - docker service update --image $CI_REGISTRY/snynu/backend/test:${CI_COMMIT_SHA} snynu_backend-test
+  - echo "deploy image $CI_REGISTRY/snynu/backend/test:${CI_COMMIT_SHA}"
+  - docker service update --image $CI_REGISTRY/snynu/backend/test:${CI_COMMIT_SHA}
+    snynu_backend-test
   only:
-    - develop
-
+  - develop
 deploy_production:
   stage: deploy
   before_script:
-    - docker login -u "$CI_DEPLOY_USER" -p "$CI_DEPLOY_PASSWORD" $CI_REGISTRY
+  - docker login -u "$CI_DEPLOY_USER" -p "$CI_DEPLOY_PASSWORD" $CI_REGISTRY
   script:
-    - echo "deploy image $CI_REGISTRY/snynu/backend:${CI_COMMIT_SHA}"
-    - docker service update --image $CI_REGISTRY/snynu/backend:${CI_COMMIT_SHA} snynu_backend
+  - echo "deploy image $CI_REGISTRY/snynu/backend:${CI_COMMIT_SHA}"
+  - docker service update --image $CI_REGISTRY/snynu/backend:${CI_COMMIT_SHA} snynu_backend
   only:
-    - master
+  - master
+sast:
+  stage: test
+include:
+- template: Security/SAST.gitlab-ci.yml
